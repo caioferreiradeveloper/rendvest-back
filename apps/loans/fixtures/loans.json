@@ -1,0 +1,103 @@
+[
+  {
+    "model": "loans.loan",
+    "pk": "33333333-3333-4333-8333-333333333333",
+    "fields": {
+      "user": "11111111-1111-4111-8111-111111111111",
+      "bank": "nubank",
+      "contracted_amount": "8000.00",
+      "iof_amount": "117.98",
+      "monthly_interest_percentage": "8.4500",
+      "monthly_cet_percentage": "8.8880",
+      "term_months": 7,
+      "started_at": "2026-09-30",
+      "first_due_date": "2026-10-30",
+      "created_at": "2026-09-30T12:00:00Z",
+      "updated_at": "2026-09-30T12:00:00Z"
+    }
+  },
+  {
+    "model": "loans.loaninstallment",
+    "pk": "44444444-4444-4444-8444-444444444441",
+    "fields": {
+      "loan": "33333333-3333-4333-8333-333333333333",
+      "number": 1,
+      "due_date": "2026-10-30",
+      "amount_due": "1583.32",
+      "interest_amount": "685.97",
+      "principal_amount": "897.35"
+    }
+  },
+  {
+    "model": "loans.loaninstallment",
+    "pk": "44444444-4444-4444-8444-444444444442",
+    "fields": {
+      "loan": "33333333-3333-4333-8333-333333333333",
+      "number": 2,
+      "due_date": "2026-11-30",
+      "amount_due": "1583.32",
+      "interest_amount": "610.14",
+      "principal_amount": "973.18"
+    }
+  },
+  {
+    "model": "loans.loaninstallment",
+    "pk": "44444444-4444-4444-8444-444444444443",
+    "fields": {
+      "loan": "33333333-3333-4333-8333-333333333333",
+      "number": 3,
+      "due_date": "2026-12-30",
+      "amount_due": "1583.32",
+      "interest_amount": "527.91",
+      "principal_amount": "1055.41"
+    }
+  },
+  {
+    "model": "loans.loaninstallment",
+    "pk": "44444444-4444-4444-8444-444444444444",
+    "fields": {
+      "loan": "33333333-3333-4333-8333-333333333333",
+      "number": 4,
+      "due_date": "2027-02-01",
+      "amount_due": "1583.32",
+      "interest_amount": "438.73",
+      "principal_amount": "1144.59"
+    }
+  },
+  {
+    "model": "loans.loaninstallment",
+    "pk": "44444444-4444-4444-8444-444444444445",
+    "fields": {
+      "loan": "33333333-3333-4333-8333-333333333333",
+      "number": 5,
+      "due_date": "2027-03-01",
+      "amount_due": "1583.32",
+      "interest_amount": "342.01",
+      "principal_amount": "1241.31"
+    }
+  },
+  {
+    "model": "loans.loaninstallment",
+    "pk": "44444444-4444-4444-8444-444444444446",
+    "fields": {
+      "loan": "33333333-3333-4333-8333-333333333333",
+      "number": 6,
+      "due_date": "2027-03-30",
+      "amount_due": "1583.32",
+      "interest_amount": "237.12",
+      "principal_amount": "1346.20"
+    }
+  },
+  {
+    "model": "loans.loaninstallment",
+    "pk": "44444444-4444-4444-8444-444444444447",
+    "fields": {
+      "loan": "33333333-3333-4333-8333-333333333333",
+      "number": 7,
+      "due_date": "2027-04-30",
+      "amount_due": "1583.31",
+      "interest_amount": "123.37",
+      "principal_amount": "1459.94"
+    }
+  }
+]

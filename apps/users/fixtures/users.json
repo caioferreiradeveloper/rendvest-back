@@ -1,0 +1,19 @@
+[
+  {
+    "model": "users.user",
+    "pk": "11111111-1111-4111-8111-111111111111",
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$GJvxSKDMNPqrleIjEGXQXO$4GiknVknXXutCYtTgigP7Rx73COJficKaZtLxJNT6i0=",
+      "last_login": null,
+      "is_superuser": false,
+      "first_name": "Usuário",
+      "last_name": "Demonstração",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-01-01T12:00:00Z",
+      "email": "demo@rendvest.local",
+      "groups": [],
+      "user_permissions": []
+    }
+  }
+]
