@@ -1,12 +1,17 @@
+# Django imports
 from django.urls import path
 
-from apps.authentication.views import CsrfTokenView, LoginView, LogoutView, RefreshView
+# App imports
+from apps.authentication.views import CsrfTokenAuth, LoginAuth, LogoutAuth, RefreshAuth
 
+# URL configuration for the authentication app
 app_name = "authentication"
 
+
+# URL patterns for the authentication app
 urlpatterns = [
-    path("csrf/", CsrfTokenView.as_view(), name="csrf"),
-    path("login/", LoginView.as_view(), name="login"),
-    path("refresh/", RefreshView.as_view(), name="refresh"),
-    path("logout/", LogoutView.as_view(), name="logout"),
+    path("csrf/", CsrfTokenAuth.as_view(), name="csrf-token-auth"),
+    path("login/", LoginAuth.as_view(), name="login-auth"),
+    path("refresh/", RefreshAuth.as_view(), name="refresh-auth"),
+    path("logout/", LogoutAuth.as_view(), name="logout-auth"),
 ]

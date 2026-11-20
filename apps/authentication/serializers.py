@@ -1,12 +1,15 @@
+# Django imports
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
+# Core imports
 from core.exceptions import InvalidCredentials
 
 
+# Serializer for user login that extends the TokenObtainPairSerializer
 class LoginSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
         try:
@@ -14,7 +17,7 @@ class LoginSerializer(TokenObtainPairSerializer):
         except AuthenticationFailed as exc:
             raise InvalidCredentials from exc
 
-
+# Serializer for user logout that handles the refresh token
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
 

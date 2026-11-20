@@ -57,10 +57,15 @@ INSTALLED_APPS = [
     "django_filters",
     "drf_spectacular",
     "core",
+    
+    
     "apps.authentication",
     "apps.users",
     "apps.transactions",
     "apps.loans",
+    "apps.debtors",
+    "apps.monthlies",
+    "apps.wishlist",
 ]
 
 MIDDLEWARE = [

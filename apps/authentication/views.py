@@ -1,3 +1,4 @@
+# Django imports
 from django.conf import settings
 from django.middleware.csrf import get_token
 from django.utils.decorators import method_decorator
@@ -10,10 +11,12 @@ from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.settings import api_settings as jwt_settings
 
+# App imports
 from apps.authentication.csrf import enforce_csrf
 from apps.authentication.serializers import LoginSerializer, LogoutSerializer
 
 
+# Utility functions to set authentication cookies
 def set_auth_cookies(response, access_token, refresh_token=None):
     cookie_options = {
         "secure": settings.JWT_COOKIE_SECURE,
@@ -39,7 +42,7 @@ def set_auth_cookies(response, access_token, refresh_token=None):
     response["Cache-Control"] = "no-store"
     return response
 
-
+# Utility functions to clear authentication cookies
 def clear_auth_cookies(response):
     response.delete_cookie(
         settings.JWT_COOKIE_ACCESS_NAME,
@@ -57,7 +60,8 @@ def clear_auth_cookies(response):
     return response
 
 
-class CsrfTokenView(APIView):
+# API view for handling CSRF token retrieval, user login, token refresh, and user logout
+class CsrfTokenAuth(APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
 
@@ -66,7 +70,8 @@ class CsrfTokenView(APIView):
         return Response({"csrfToken": get_token(request._request)})
 
 
-class LoginView(APIView):
+# API view for user login that uses the LoginSerializer to validate credentials and set authentication cookies
+class LoginAuth(APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
     throttle_classes = [ScopedRateThrottle]
@@ -84,7 +89,8 @@ class LoginView(APIView):
         )
 
 
-class RefreshView(APIView):
+# API view for refreshing the access token using the refresh token stored in cookies
+class RefreshAuth(APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
     throttle_classes = [ScopedRateThrottle]
@@ -106,7 +112,8 @@ class RefreshView(APIView):
         )
 
 
-class LogoutView(generics.GenericAPIView):
+# API view for user logout that uses the LogoutSerializer to validate the refresh token and clear authentication cookies
+class LogoutAuth(generics.GenericAPIView):
     serializer_class = LogoutSerializer
     permission_classes = [permissions.AllowAny]
     authentication_classes = []

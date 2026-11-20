@@ -1,10 +1,15 @@
+# Django imports
 from django.urls import path
 
-from apps.users.views import CurrentUserView, RegisterView
+# App imports
+from apps.users.views import ExternalUserCreate, CurrentUserDetail
 
+# URL configuration for the user app
 app_name = "users"
 
+
+# URL patterns for the user app
 urlpatterns = [
-    path("", RegisterView.as_view(), name="register"),
-    path("me/", CurrentUserView.as_view(), name="me"),
+    path("external-create/", ExternalUserCreate.as_view(), name="external-user-create"),
+    path("current/", CurrentUserDetail.as_view(), name="current-user-detail"),
 ]
