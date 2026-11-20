@@ -4,6 +4,7 @@ from django.db import transaction
 from rest_framework import serializers
 
 from apps.loans.models import Loan, LoanInstallment, LoanPayment
+from core.enums import Bank
 
 
 class LoanSerializer(serializers.ModelSerializer):
@@ -23,6 +24,11 @@ class LoanSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     amount_paid = serializers.DecimalField(
+        max_digits=24,
+        decimal_places=2,
+        read_only=True,
+    )
+    discount_amount = serializers.DecimalField(
         max_digits=24,
         decimal_places=2,
         read_only=True,
@@ -49,6 +55,7 @@ class LoanSerializer(serializers.ModelSerializer):
             "monthly_installment_amount",
             "total_with_interest",
             "amount_paid",
+            "discount_amount",
             "remaining_amount",
             "created_at",
             "updated_at",
@@ -123,6 +130,11 @@ class LoanInstallmentSerializer(serializers.ModelSerializer):
         decimal_places=2,
         read_only=True,
     )
+    discount_amount = serializers.DecimalField(
+        max_digits=24,
+        decimal_places=2,
+        read_only=True,
+    )
     remaining_amount = serializers.DecimalField(
         max_digits=24,
         decimal_places=2,
@@ -140,6 +152,7 @@ class LoanInstallmentSerializer(serializers.ModelSerializer):
             "interest_amount",
             "principal_amount",
             "amount_paid",
+            "discount_amount",
             "remaining_amount",
             "status",
         ]
@@ -147,6 +160,7 @@ class LoanInstallmentSerializer(serializers.ModelSerializer):
 
 
 class LoanPaymentSerializer(serializers.ModelSerializer):
+    bank = serializers.ChoiceField(choices=Bank.choices, required=False, write_only=True)
     installment_number = serializers.IntegerField(min_value=1, write_only=True)
     paid_at = serializers.DateTimeField(required=False)
     interest_portion = serializers.DecimalField(
@@ -159,6 +173,11 @@ class LoanPaymentSerializer(serializers.ModelSerializer):
         decimal_places=2,
         read_only=True,
     )
+    discount_amount = serializers.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        read_only=True,
+    )
     expense_transaction_id = serializers.UUIDField(read_only=True)
 
     class Meta:
@@ -166,9 +185,11 @@ class LoanPaymentSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "installment_number",
+            "bank",
             "amount",
             "interest_portion",
             "principal_portion",
+            "discount_amount",
             "paid_at",
             "expense_transaction_id",
             "created_at",
@@ -177,6 +198,7 @@ class LoanPaymentSerializer(serializers.ModelSerializer):
             "id",
             "interest_portion",
             "principal_portion",
+            "discount_amount",
             "expense_transaction_id",
             "created_at",
         ]
@@ -188,6 +210,7 @@ class LoanPaymentSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop("installment_number")
+        validated_data.pop("bank", None)
         return super().create(validated_data)
 
     def to_representation(self, instance):

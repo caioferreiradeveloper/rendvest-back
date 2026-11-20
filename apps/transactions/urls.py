@@ -1,19 +1,24 @@
+# Django imports
 from django.urls import path
 
+# App imports
 from apps.transactions.views import (
-    ExpenseCollectionView,
-    ExpenseDetailView,
-    IncomeCollectionView,
-    IncomeDetailView,
-    ListTransactions,
+    TransactionList,
+    TransactionCreate,
+    TransactionDetail,
+    TransactionUpdate,
+    TransactionDelete,
 )
 
+# URL configuration for the transaction app
 app_name = "transactions"
 
+
+# URL patterns for the transaction app
 urlpatterns = [
-    path("", ListTransactions.as_view(), name="transaction-list"),
-    path("incomes/", IncomeCollectionView.as_view(), name="income-list"),
-    path("incomes/<uuid:pk>/", IncomeDetailView.as_view(), name="income-detail"),
-    path("expenses/", ExpenseCollectionView.as_view(), name="expense-list"),
-    path("expenses/<uuid:pk>/", ExpenseDetailView.as_view(), name="expense-detail"),
+    path("", TransactionList.as_view(), name="transaction-list"),
+    path("create/", TransactionCreate.as_view(), name="transaction-create"),
+    path("<uuid:pk>/", TransactionDetail.as_view(), name="transaction-detail"),
+    path("update/<uuid:pk>/", TransactionUpdate.as_view(), name="transaction-update"),
+    path("delete/<uuid:pk>/", TransactionDelete.as_view(), name="transaction-delete"),
 ]

@@ -1,16 +1,23 @@
+# Utility imports
 import calendar
 import uuid
 from datetime import date, timedelta
 from decimal import ROUND_HALF_UP, Decimal
 
+# Django imports
 from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import Q, Sum
 from django.utils import timezone
 
+# App imports
 from apps.transactions.models import Transaction
 
+# Core imports
+from core.enums import Bank
+
+# Constants
 CENT = Decimal("0.01")
 ZERO = Decimal("0.00")
 
@@ -22,7 +29,7 @@ class Loan(models.Model):
         on_delete=models.CASCADE,
         related_name="loans",
     )
-    bank = models.CharField(max_length=20, choices=Transaction.Bank.choices, blank=True, default="")
+    bank = models.CharField(max_length=20, choices=Bank.choices, blank=True, default="")
     contracted_amount = models.DecimalField(
         max_digits=12,
         decimal_places=2,
@@ -105,8 +112,14 @@ class Loan(models.Model):
         return self.installments.aggregate(total=Sum("payments__amount"))["total"] or ZERO
 
     @property
+    def discount_amount(self):
+        return (
+            self.installments.aggregate(total=Sum("payments__discount_amount"))["total"] or ZERO
+        )
+
+    @property
     def remaining_amount(self):
-        return max(self.total_with_interest - self.amount_paid, ZERO)
+        return max(self.total_with_interest - self.amount_paid - self.discount_amount, ZERO)
 
     def generate_installments(self):
         if self.installments.exists():
@@ -199,8 +212,12 @@ class LoanInstallment(models.Model):
         return self.payments.aggregate(total=Sum("amount"))["total"] or ZERO
 
     @property
+    def discount_amount(self):
+        return self.payments.aggregate(total=Sum("discount_amount"))["total"] or ZERO
+
+    @property
     def remaining_amount(self):
-        return max(self.amount_due - self.amount_paid, ZERO)
+        return max(self.amount_due - self.amount_paid - self.discount_amount, ZERO)
 
     @property
     def status(self):
@@ -228,6 +245,7 @@ class LoanPayment(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"))],
     )
+    discount_amount = models.DecimalField(max_digits=12, decimal_places=2, default=ZERO)
     interest_portion = models.DecimalField(max_digits=12, decimal_places=2, default=ZERO)
     principal_portion = models.DecimalField(max_digits=12, decimal_places=2, default=ZERO)
     paid_at = models.DateTimeField()
@@ -242,6 +260,10 @@ class LoanPayment(models.Model):
         ordering = ["-paid_at", "-created_at"]
         constraints = [
             models.CheckConstraint(condition=Q(amount__gt=0), name="loan_payment_amount_positive"),
+            models.CheckConstraint(
+                condition=Q(discount_amount__gte=0),
+                name="loan_payment_discount_nonnegative",
+            ),
             models.CheckConstraint(
                 condition=Q(interest_portion__gte=0),
                 name="loan_payment_interest_nonnegative",

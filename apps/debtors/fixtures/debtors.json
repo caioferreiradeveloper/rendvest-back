@@ -1,0 +1,17 @@
+[
+  {
+    "model": "debtors.debtor",
+    "pk": "55555555-5555-4555-8555-555555555555",
+    "fields": {
+      "user": "642fc589-4374-4dc9-b4cb-fe7551620802",
+      "debtor_name": "Maria Souza",
+      "amount": "250.00",
+      "description": "Divida do jantar",
+      "occurred_at": "2026-11-01T09:00:00Z",
+      "paid_amount": "0.00",
+      "paid_at": null,
+      "created_at": "2026-11-01T09:00:00Z",
+      "updated_at": "2026-11-01T09:00:00Z"
+    }
+  }
+]

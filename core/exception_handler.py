@@ -1,16 +1,21 @@
+# Utility imports
 import logging
 
+# Django imports
 from django.db.utils import IntegrityError, InterfaceError, OperationalError
 from rest_framework import exceptions, status
 from rest_framework.response import Response
 from rest_framework.views import exception_handler as drf_exception_handler
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
+# Core imports
 from core.errors import ERROR_CATALOG
 
+# Initializes the module-level logger for recording application errors
 logger = logging.getLogger(__name__)
 
 
+# Recursively flattens nested validation errors into a standardized list of field messages
 def _flatten_field_errors(detail, field=None):
     flattened = []
     if isinstance(detail, dict):
@@ -30,6 +35,7 @@ def _flatten_field_errors(detail, field=None):
     return flattened
 
 
+# Builds a standardized API error response using the configured error catalog
 def _error_response(error_code, *, errors=None, status_code=None):
     definition = ERROR_CATALOG[error_code]
     return Response(
@@ -42,6 +48,7 @@ def _error_response(error_code, *, errors=None, status_code=None):
     )
 
 
+# Handles application and framework exceptions using the RendVest API error format
 def rendvest_exception_handler(exc, context):
     if isinstance(exc, OperationalError | InterfaceError):
         logger.error(

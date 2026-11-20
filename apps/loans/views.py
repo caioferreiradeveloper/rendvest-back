@@ -19,9 +19,12 @@ from apps.loans.models import Loan, LoanInstallment, LoanPayment
 from apps.loans.serializers import LoanInstallmentSerializer, LoanPaymentSerializer, LoanSerializer
 from apps.transactions.models import Transaction
 
+# Core imports
+from core.enums import Bank, Type
+
 
 class LoanFilter(filters.FilterSet):
-    type_bank = filters.ChoiceFilter(field_name="bank", choices=Transaction.Bank.choices)
+    type_bank = filters.ChoiceFilter(field_name="bank", choices=Bank.choices)
 
     class Meta:
         model = Loan
@@ -121,6 +124,21 @@ class LoanPaymentListCreateView(generics.ListAPIView, generics.CreateAPIView):
                 {"amount": f"O valor não pode exceder o saldo da parcela (R$ {remaining_amount})."}
             )
 
+        paid_at = serializer.validated_data.get("paid_at") or timezone.now()
+        discount_amount = Decimal("0.00")
+        if amount < remaining_amount:
+            if timezone.localtime(paid_at).date() >= installment.due_date:
+                raise serializers.ValidationError(
+                    {
+                        "amount": (
+                            "Pagamento parcial não permitido após o vencimento. "
+                            "Antes do vencimento, o valor informado quita a parcela "
+                            "com desconto."
+                        )
+                    }
+                )
+            discount_amount = remaining_amount - amount
+
         interest_paid = installment.payments.aggregate(total=Sum("interest_portion"))["total"]
         interest_remaining = max(
             installment.interest_amount - (interest_paid or Decimal("0.00")),
@@ -128,12 +146,11 @@ class LoanPaymentListCreateView(generics.ListAPIView, generics.CreateAPIView):
         )
         interest_portion = min(amount, interest_remaining)
         principal_portion = amount - interest_portion
-        paid_at = serializer.validated_data.get("paid_at") or timezone.now()
         expense = Transaction.objects.create(
             user=self.request.user,
-            type=Transaction.Type.EXPENSE,
+            type=Type.EXPENSE,
             amount=amount,
-            bank=loan.bank,
+            bank=serializer.validated_data.get("bank", loan.bank),
             category="Pagamento de empréstimo",
             description=f"Pagamento da parcela {installment.number} do empréstimo {loan.pk}",
             occurred_at=paid_at,
@@ -141,6 +158,7 @@ class LoanPaymentListCreateView(generics.ListAPIView, generics.CreateAPIView):
         serializer.save(
             installment=installment,
             paid_at=paid_at,
+            discount_amount=discount_amount,
             interest_portion=interest_portion,
             principal_portion=principal_portion,
             expense_transaction=expense,

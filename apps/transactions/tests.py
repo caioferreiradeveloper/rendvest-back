@@ -179,3 +179,26 @@ class TransactionApiTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data["code"], "RENDVEST_ERROR_0002")
         self.assertEqual(response.data["errors"][0]["field"], "bank")
+
+
+class TransactionCreateTypeTests(APITestCase):
+    def test_create_preserves_type_sent_by_client(self):
+        user = User.objects.create_user(
+            email="owner@example.com",
+            password="SecurePassword123!",
+        )
+        self.client.force_authenticate(user)
+
+        response = self.client.post(
+            reverse("transactions:transaction-create"),
+            {
+                "type": Transaction.Type.INCOME,
+                "amount": "1250.00",
+                "bank": Transaction.Bank.NUBANK,
+                "category": "Salary",
+                "occurred_at": "2026-11-01T09:00:00Z",
+            },
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["type"], Transaction.Type.INCOME)
