@@ -60,6 +60,8 @@ A API estará disponível em `http://localhost:8000`. Documentação interativa:
 
 Os endpoints estão separados por módulo em `/api/v1/auth/`, `/api/v1/users/`, `/api/v1/transactions/` e `/api/v1/loans/`.
 
+O dashboard autenticado em `GET /api/v1/dashboard/` reúne 19 indicadores e o fluxo de caixa do mês atual e dos cinco anteriores. O parâmetro opcional `bank` filtra o saldo, os lançamentos, o histórico e as movimentações recentes. Empréstimos, devedores, lista de desejos e mensalidades consideram todos os registros do usuário.
+
 ## Formato de erros da API
 
 As respostas de erro usam o mesmo formato e códigos definidos em `core/errors.py`:
@@ -205,6 +207,15 @@ Exemplo de pagamento parcial de R$ 897,00 da primeira parcela:
 ```
 
 O gasto criado registra R$ 897,00, e a parcela fica parcialmente paga com o saldo restante. O histórico de pagamentos inclui o valor destinado a juros e a principal.
+
+### Pesquisa de investimentos
+
+Configure `BOLSAI_API_KEY` no ambiente do backend para habilitar as rotas autenticadas.
+
+| Rota | Uso |
+| --- | --- |
+| `GET /api/v1/investments/assets/?type=stock&q=petrobras&page=1` | Pesquisa ações por código, empresa ou setor. Use `type=fii` para pesquisar fundos imobiliários por código, nome ou segmento. |
+| `GET /api/v1/investments/quotes/PETR4/` | Retorna o último fechamento disponível em reais e a data do pregão em `trade_date`. A cotação é salva no banco por ticker, para ações e FIIs, e consultada novamente na Bolsai após uma hora da última atualização bem-sucedida. |
 
 ## Segurança
 

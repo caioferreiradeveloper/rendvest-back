@@ -23,6 +23,7 @@ environ.Env.read_env(BASE_DIR / ".env")
 
 SECRET_KEY = env("DJANGO_SECRET_KEY", default="")
 DEBUG = env("DJANGO_DEBUG")
+BOLSAI_API_KEY = env("BOLSAI_API_KEY", default="")
 if not DEBUG and not SECRET_KEY:
     raise environ.ImproperlyConfigured("DJANGO_SECRET_KEY deve ser definido fora do modo debug.")
 
@@ -66,6 +67,7 @@ INSTALLED_APPS = [
     "apps.debtors",
     "apps.monthlies",
     "apps.wishlist",
+    "apps.investments",
 ]
 
 MIDDLEWARE = [
@@ -149,6 +151,7 @@ REST_FRAMEWORK = {
         "auth_login": "5/minute",
         "auth_refresh": "30/minute",
         "auth_logout": "10/minute",
+        "investment_research": "60/minute",
     },
 }
 

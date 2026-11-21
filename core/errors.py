@@ -54,4 +54,9 @@ ERROR_CATALOG = {
         "message": "A validação de segurança falhou. Atualize a página e tente novamente.",
         "status": 403,
     },
+    "RENDVEST_ERROR_0012": {
+        "key": "MARKET_DATA_UNAVAILABLE",
+        "message": "Os dados de mercado estão temporariamente indisponíveis.",
+        "status": 503,
+    },
 }
