@@ -1,11 +1,19 @@
 from django.utils.text import slugify
 from drf_spectacular.utils import extend_schema
+from rest_framework.generics import ListCreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .catalog import list_funds, list_stocks
+from .models import Investment
 from .quotes import get_quote
-from .serializers import AssetSearchParams, AssetSearchResult, Quote, TickerParams
+from .serializers import (
+    AssetSearchParams,
+    AssetSearchResult,
+    InvestmentSerializer,
+    Quote,
+    TickerParams,
+)
 
 PAGE_SIZE = 20
 
@@ -49,3 +57,15 @@ class QuoteView(APIView):
         ticker = params.validated_data["ticker"].upper()
 
         return Response(get_quote(ticker))
+
+
+class InvestmentListCreateView(ListCreateAPIView):
+    queryset = Investment.objects.none()
+    serializer_class = InvestmentSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        return Investment.objects.filter(user=self.request.user, type=Investment.Type.FII)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
