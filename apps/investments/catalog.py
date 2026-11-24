@@ -1,6 +1,9 @@
 import re
 
+from django.core.cache import cache
+
 from .bolsai import MarketDataUnavailable, get_market_data
+from .brapi import fetch_brapi
 
 CATALOG_CACHE_SECONDS = 3600
 STOCK_TICKER = re.compile(r"[A-Z0-9]{4}(?:[3-8]|11)")
@@ -44,7 +47,21 @@ def list_stocks():
 
 
 def list_funds():
-    return [
-        {"ticker": item["ticker"], "name": item.get("name"), "segment": item.get("segment")}
-        for item in catalog_items("fiis/?format=json", "fiis", 5000)
+    cache_key = "investments:brapi:fii-catalog"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    data = fetch_brapi("quote/list?type=fund&subType=fii")
+    items = data.get("stocks")
+    if not isinstance(items, list) or not items:
+        raise MarketDataUnavailable()
+    funds = [
+        {"ticker": item["stock"], "name": item.get("name"), "segment": item.get("subsector")}
+        for item in items
+        if isinstance(item, dict) and item.get("subType") == "fii" and item.get("stock")
     ]
+    if not funds:
+        raise MarketDataUnavailable()
+    cache.set(cache_key, funds, CATALOG_CACHE_SECONDS)
+    return funds

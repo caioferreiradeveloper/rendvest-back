@@ -210,12 +210,18 @@ O gasto criado registra R$ 897,00, e a parcela fica parcialmente paga com o sald
 
 ### Pesquisa de investimentos
 
-Configure `BOLSAI_API_KEY` no ambiente do backend para habilitar as rotas autenticadas.
+Configure `BRAPI_API_TOKEN` no backend para consultar FIIs pela brapi. A `BOLSAI_API_KEY` continua sendo usada no catálogo, nas cotações de ações e como fonte complementar para dados de FIIs.
 
 | Rota | Uso |
 | --- | --- |
+| `GET /api/v1/investments/` | Lista as compras de FIIs do usuário autenticado. |
+| `POST /api/v1/investments/` | Registra uma compra de FII com `asset` (ticker), `quantity` (cotas), `amount` (valor total em reais) e `invested_at` (data da compra). |
 | `GET /api/v1/investments/assets/?type=stock&q=petrobras&page=1` | Pesquisa ações por código, empresa ou setor. Use `type=fii` para pesquisar fundos imobiliários por código, nome ou segmento. |
-| `GET /api/v1/investments/quotes/PETR4/` | Retorna o último fechamento disponível em reais e a data do pregão em `trade_date`. A cotação é salva no banco por ticker, para ações e FIIs, e consultada novamente na Bolsai após uma hora da última atualização bem-sucedida. |
+| `GET /api/v1/investments/quotes/PETR4/` | Retorna o último fechamento da ação pela Bolsai. |
+| `GET /api/v1/investments/funds/HGLG11/quote/` | Retorna a cotação do FII pela brapi. As rotas de perfil, preços, estatísticas e rendimentos leem o mesmo registro persistido por ticker. |
+| `POST /api/v1/investments/funds/HGLG11/refresh/` | Força a atualização do fundo e retorna os dados atualizados e `updated_at`. Requer sessão autenticada e CSRF. |
+
+O comando `python manage.py refresh_funds` atualiza os FIIs cadastrados com dados coletados há pelo menos uma hora. Para execução em segundo plano, agende o comando periodicamente no ambiente que tem acesso ao banco e às chaves. As consultas ao fundo também atualizam registros vencidos. Em caso de falha na consulta automática, os dados já salvos continuam disponíveis.
 
 ## Segurança
 

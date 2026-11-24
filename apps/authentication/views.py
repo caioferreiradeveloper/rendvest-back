@@ -1,9 +1,11 @@
 # Django imports
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.middleware.csrf import get_token
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 from rest_framework import generics, permissions, status
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
@@ -103,7 +105,10 @@ class RefreshAuth(APIView):
             raise InvalidToken("Refresh token ausente.")
 
         serializer = TokenRefreshSerializer(data={"refresh": refresh_token})
-        serializer.is_valid(raise_exception=True)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except (AuthenticationFailed, ObjectDoesNotExist) as exc:
+            raise InvalidToken("Sessão indisponível.") from exc
         response = Response({"detail": "Token renovado com sucesso."})
         return set_auth_cookies(
             response,
